@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agar Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #f2fbff; font-family: 'Ubuntu', sans-serif; user-select: none; }
+        .background-grid { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(#ccc 1px, transparent 1px), linear-gradient(90deg, #ccc 1px, transparent 1px); background-size: 40px 40px; z-index: -1; }
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.6); z-index: 10; backdrop-filter: blur(2px); }
+        .container { display: flex; gap: 20px; align-items: flex-start; justify-content: center; }
+        .column { display: flex; flex-direction: column; gap: 15px; }
+        .col-side { width: 300px; }
+        .col-center { width: 360px; text-align: center; }
+        .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 6px 15px rgba(0,0,0,0.15); position: relative; border: 1px solid #eee; }
+        h2 { margin: 0 0 10px 0; color: #333; font-size: 18px; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; }
+        ul { padding-left: 20px; margin: 0; }
+        li { font-size: 13px; color: #666; margin-bottom: 4px; line-height: 1.4; }
+        .profile-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .avatar-circle { width: 50px; height: 50px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #888; border: 2px solid #ddd; }
+        .profile-info { flex: 1; text-align: left; }
+        .profile-name { font-weight: bold; font-size: 18px; color: #333; display: block; }
+        .currency-row { display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 8px; border-radius: 8px; margin-top: 10px; border: 1px solid #eee; }
+        .gold-display { font-weight: bold; color: #f39c12; font-size: 16px; display: flex; align-items: center; gap: 5px; }
+        .btn-shop { background: #3498db; color: white; padding: 8px; width: 100%; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-logout { background: #e74c3c; margin-top: 5px; width: 100%; padding: 5px; font-size: 11px; cursor: pointer; border: none; border-radius: 4px; color: white; }
+        .game-logo { font-size: 42px; font-weight: 800; color: #444; margin-bottom: 20px; text-transform: uppercase; letter-spacing: -2px; text-shadow: 2px 2px 0px #eee; }
+        .input-group { margin-bottom: 10px; text-align: left; }
+        .input-label { font-size: 12px; color: #777; font-weight: bold; margin-bottom: 4px; display: block; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: 'Ubuntu', sans-serif; font-size: 16px; box-sizing: border-box; outline: none; background: white; }
+        input:focus { border-color: #2ecc71; }
+        .play-btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-family: 'Ubuntu', sans-serif; font-size: 22px; font-weight: 800; color: white; cursor: pointer; background: linear-gradient(to bottom, #2ecc71, #27ae60); box-shadow: 0 4px 0 #219150; margin-top: 5px; transition: transform 0.1s; }
+        .play-btn:active { transform: translateY(4px); box-shadow: none; }
+        .auth-box { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #e0e0e0; }
+        .auth-title { font-size: 14px; font-weight: bold; color: #555; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; text-align: center; }
+        .auth-buttons { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-login-auth { flex: 1; background: #3498db; color: white; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-register-auth { flex: 1; background: #9b59b6; color: white; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .leaderboard-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
+        .leaderboard-row span:nth-child(2) { color: #ff5448; font-weight: bold; }
+        .hidden { display: none !important; }
+        #errorMsg { color: #e74c3c; font-size: 13px; margin-top: 5px; min-height: 20px; text-align: center; }
+        
+        #chatContainer { position: fixed; bottom: 250px; left: 10px; width: 300px; z-index: 5; pointer-events: none; }
+        #chatList { list-style: none; padding: 10px; margin: 0 0 10px 0; height: 150px; overflow-y: auto; background: rgba(0,0,0,0.4); border-radius: 6px; color: white; font-size: 13px; text-shadow: 1px 1px 1px black; display: flex; flex-direction: column; justify-content: flex-end; pointer-events: auto; }
+        #chatInput { width: 100%; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: white; pointer-events: auto; text-align: left; padding: 8px; border-radius: 4px; box-sizing: border-box; }
+        
+        /* PARTY CSS (Sol Üst) */
+        .party-btn { padding: 8px; font-size: 13px; cursor: pointer; border: none; border-radius: 6px; color: white; font-weight:bold; }
+        .party-input { padding: 8px; border: 2px solid #eee; border-radius: 6px; width: 100%; font-size: 14px; box-sizing: border-box; margin-bottom: 5px; }
+        .party-list { list-style: none; padding: 0; margin: 10px 0 0 0; }
+        .party-list li { padding: 6px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; font-size: 13px; color:#555; }
+
+        /* OYUN İÇİ LİDERLİK (Sağ Üst) - YENİ */
+        #ingameLeaderboard {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 220px;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 8px;
+            color: white;
+            z-index: 5;
+            backdrop-filter: blur(2px);
+            pointer-events: none; /* Tıklamaları engellemesin */
+        }
+        #ingameLeaderboard h3 { margin: 0 0 10px 0; font-size: 16px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom:5px; }
+        .lb-item { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+        .lb-item b { color: #f1c40f; }
+    </style>
+</head>
+<body>
+    <div class="background-grid"></div>
+
+    <div id="ingameLeaderboard" class="hidden">
+        <h3>Lider Tablosu 🏆</h3>
+        <div id="lbContent">
+            </div>
+    </div>
+
+    <div id="loginOverlay">
+        <div class="container">
+            
+            <div class="column col-side">
+                <div class="card" id="profileCard">
+                    <div id="guestView">
+                        <div class="profile-header">
+                            <div class="avatar-circle"><i class="fas fa-user"></i></div>
+                            <div class="profile-info"><span class="profile-name">Misafir</span><span style="font-size:12px; color:#888;">Giriş yapılmadı</span></div>
+                        </div>
+                    </div>
+                    <div id="memberView" class="hidden">
+                        <div class="profile-header">
+                            <div class="avatar-circle" style="background:#e8f8f5; color:#2ecc71;"><i class="fas fa-user-check"></i></div>
+                            <div class="profile-info"><span class="profile-name" id="pName">User</span><span style="font-size:12px; color:#f1c40f;" id="vipTag">ÜYE</span></div>
+                        </div>
+                        <div class="currency-row"><span>GOLD:</span><div class="gold-display"><span id="pGold">0</span> 🟡</div></div>
+                        <button class="btn-shop" onclick="goShop()">Shop'a Git</button>
+                        <button class="btn-logout" onclick="logout()">Çıkış Yap</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2><i class="fas fa-book"></i> Kurallar</h2>
+                    <ul><li>Herkes 300 puanla başlar.</li><li>Harita sınırına dikkat et.</li><li>Takım olmak serbest.</li><li>Hile yasaktır.</li></ul>
+                </div>
+
+                <div class="card hidden" id="partyCard">
+                    <h2><i class="fas fa-users"></i> Parti Kur</h2>
+                    <div id="partyControls">
+                        <button class="party-btn" style="background:#2ecc71; width:100%; margin-bottom:10px;" onclick="window.createParty()">Parti Oluştur</button>
+                        <div style="font-size:12px; color:#888; text-align:center; margin-bottom:5px;">- VEYA -</div>
+                        <div style="display:flex; gap:5px;">
+                            <input type="text" id="partyCodeInput" class="party-input" placeholder="Parti Kodu">
+                            <button class="party-btn" style="background:#3498db; width:80px;" onclick="window.joinParty()">Katıl</button>
+                        </div>
+                    </div>
+                    <div id="partyLobby" class="hidden">
+                        <div style="background:#f9f9f9; padding:8px; text-align:center; font-weight:bold; border-radius:6px; border:1px dashed #ccc; color:#333;">
+                            KOD: <span id="displayPartyCode" style="color:#e67e22;">------</span>
+                        </div>
+                        <ul class="party-list" id="partyMembersList"></ul>
+                        <button class="party-btn" style="background:#e74c3c; width:100%; margin-top:10px;" onclick="window.leaveParty()">Ayrıl</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="column col-center">
+                <div class="game-logo">AGAR PRO</div>
+                
+                <div class="card" style="padding: 25px;">
+                    <div id="restartScreen" class="hidden">
+                        <h2 style="color:#e74c3c; border:none; font-size:24px;">ELENDİN!</h2>
+                        <p>Skorun: <span id="finalScore" style="color:#f1c40f; font-weight:bold;">0</span></p>
+                        <p id="goldEarnedMsg" style="color:#d35400; font-weight:bold; font-size:14px;"></p>
+                        <button class="play-btn" style="background:#3498db; font-size:18px;" onclick="restartGame()">TEKRAR OYNA</button>
+                        <button class="btn-logout" style="margin-top:10px; background:#7f8c8d;" onclick="logout()">MENÜYE DÖN</button>
+                    </div>
+
+                    <div id="mainForm">
+                        <div class="input-group">
+                            <label class="input-label">Sunucu Seç:</label>
+                            <select id="serverSelect">
+                                <option value="ffa1">FFA 1 (Avrupa)</option>
+                                <option value="ffa2">FFA 2 (Türkiye) - Yakında</option>
+                                <option value="exp">Experimental</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label class="input-label">Kullanıcı Adı:</label>
+                            <input type="text" id="nickname" placeholder="Nick Yaz...">
+                        </div>
+                        
+                        <button class="play-btn" onclick="playGame()">OYNA</button>
+
+                        <div id="authBox" class="auth-box">
+                            <div class="auth-title">HESAP GİRİŞİ / KAYIT</div>
+                            <input type="email" id="email" placeholder="E-posta Adresi" style="margin-bottom:8px; padding:10px; font-size:14px;">
+                            <input type="password" id="password" placeholder="Şifre" style="margin-bottom:8px; padding:10px; font-size:14px;">
+                            <div class="auth-buttons">
+                                <button class="btn-login-auth" onclick="submitLogin()">GİRİŞ YAP</button>
+                                <button class="btn-register-auth" onclick="submitRegister()">KAYIT OL</button>
+                            </div>
+                            <div id="errorMsg"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="column col-side">
+                <div class="card">
+                    <h2><i class="fas fa-gamepad"></i> Nasıl Oynanır?</h2>
+                    <ul>
+                        <li><b>Mouse:</b> Yön ver</li>
+                        <li><b>W:</b> Yem at</li>
+                        <li><b>Space:</b> Bölün</li>
+                        <li><b>Q:</b> Birleş</li>
+                        <li><b>E:</b> Şans Çarkı 🎰</li>
+                        <li><b>R:</b> Arena (1v1) ⚔️</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h2><i class="fas fa-trophy"></i> Liderlik</h2>
+                    <div class="leaderboard-row"><span>1. ProPlayer</span><span>25K</span></div>
+                    <div class="leaderboard-row"><span>2. AgarKing</span><span>21K</span></div>
+                    <div class="leaderboard-row"><span>3. VirusMaster</span><span>18K</span></div>
+                </div>
+                <div class="card" style="background: linear-gradient(135deg, #f1c40f, #f39c12); color: white;">
+                    <h3 style="color:white; margin:0;">PREMIUM</h3>
+                    <p style="color:rgba(255,255,255,0.9); font-size:12px; margin-bottom:5px;">3x Gold kazan!</p>
+                    <button style="background:white; color:#e67e22; border:none; padding:8px; width:100%; border-radius:4px; font-weight:bold; cursor:pointer;" onclick="buyPremium()">SATIN AL (500 G)</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="chatContainer">
+        <ul id="chatList"></ul>
+        <input type="text" id="chatInput" placeholder="Sohbet...">
+    </div>
+    <canvas id="gameCanvas"></canvas>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>

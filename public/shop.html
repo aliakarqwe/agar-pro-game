@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Agar Pro • Shop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#070A12;
+      --panel:rgba(255,255,255,0.06);
+      --panel2:rgba(255,255,255,0.10);
+      --border:rgba(255,255,255,0.10);
+      --txt:#EAF0FF;
+      --muted:rgba(234,240,255,0.65);
+      --brand:#6EE7FF;
+      --brand2:#A78BFA;
+      --good:#34D399;
+      --warn:#FBBF24;
+      --bad:#FB7185;
+      --shadow: 0 20px 70px rgba(0,0,0,0.55);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:'Ubuntu',sans-serif;
+      color:var(--txt);
+      background:
+        radial-gradient(900px 500px at 20% 10%, rgba(110,231,255,0.20), transparent 60%),
+        radial-gradient(900px 600px at 80% 20%, rgba(167,139,250,0.18), transparent 60%),
+        radial-gradient(1000px 700px at 50% 90%, rgba(52,211,153,0.10), transparent 60%),
+        var(--bg);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+    .topbar{
+      position:sticky; top:0; z-index:5;
+      backdrop-filter: blur(10px);
+      background: rgba(7,10,18,0.75);
+      border-bottom:1px solid var(--border);
+    }
+    .topbar-inner{
+      max-width:1100px; margin:0 auto; padding:14px 18px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; letter-spacing:0.5px;
+      text-transform:uppercase;
+    }
+    .brand-badge{
+      width:34px; height:34px; border-radius:10px;
+      background: linear-gradient(135deg, rgba(110,231,255,0.85), rgba(167,139,250,0.85));
+      box-shadow: 0 10px 30px rgba(110,231,255,0.15);
+    }
+    .pill{
+      display:flex; align-items:center; gap:10px;
+      padding:8px 12px; border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      font-weight:700;
+    }
+    .pill small{font-weight:700;color:var(--muted)}
+    .btn{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color:var(--txt);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:800;
+      transition: transform .08s ease, background .15s ease;
+    }
+    .btn:hover{background: rgba(255,255,255,0.10)}
+    .btn:active{transform: translateY(1px)}
+    .btn-primary{
+      border-color: rgba(110,231,255,0.35);
+      background: linear-gradient(135deg, rgba(110,231,255,0.20), rgba(167,139,250,0.20));
+    }
+    .wrap{max-width:1100px; margin:0 auto; padding:18px;}
+    .grid{
+      display:grid; gap:16px;
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+    @media(max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+    .card{
+      background: var(--panel);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+    .card h2{
+      margin:0 0 10px 0;
+      font-size:16px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px solid rgba(255,255,255,0.08);
+      padding-bottom:10px;
+    }
+    .sub{color:var(--muted); font-size:13px; margin-top:-2px}
+    .row{display:flex; gap:12px; flex-wrap:wrap}
+    .tile{
+      flex: 1 1 160px;
+      background: var(--panel2);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      min-width:160px;
+    }
+    .tile b{display:block; font-size:14px}
+    .tile span{color:var(--muted); font-size:12px}
+    .divider{height:12px}
+    /* Wheel */
+    .wheel-area{display:grid; gap:14px; grid-template-columns: 1fr 1fr; align-items:center}
+    @media(max-width: 980px){ .wheel-area{grid-template-columns:1fr} }
+    #wheelCanvas{width:100%; max-width:360px; aspect-ratio:1/1; background: rgba(0,0,0,0.25); border-radius:18px; border:1px solid var(--border); }
+    .wheel-controls{display:flex; flex-direction:column; gap:10px;}
+    .hint{color:var(--muted); font-size:12px; line-height:1.35}
+    .cooldown{font-weight:800}
+    /* CS2 style reel */
+    .reel-wrap{
+      position:relative;
+      overflow:hidden;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,0.28);
+      height:110px;
+    }
+    .reel{
+      display:flex;
+      height:110px;
+      align-items:center;
+      gap:10px;
+      padding:0 14px;
+      will-change: transform;
+    }
+    .reel-item{
+      flex: 0 0 160px;
+      height:78px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.07);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      padding:10px 12px;
+    }
+    .reel-item .t{font-weight:900}
+    .reel-item .d{color:var(--muted); font-size:12px; margin-top:4px}
+    .marker{
+      position:absolute; top:0; bottom:0; left:50%;
+      width:0; transform:translateX(-50%);
+      border-left:2px solid rgba(110,231,255,0.8);
+      box-shadow: 0 0 18px rgba(110,231,255,0.35);
+      pointer-events:none;
+    }
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:22px;
+      transform:translateX(-50%);
+      padding:10px 12px;
+      border-radius:12px;
+      background: rgba(0,0,0,0.70);
+      border:1px solid rgba(255,255,255,0.12);
+      color:var(--txt);
+      font-weight:800;
+      display:none;
+      z-index:10;
+      max-width: 92vw;
+    }
+    .lock{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      padding:14px;
+      border-radius:16px;
+      border:1px dashed rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.04);
+    }
+    .lock b{font-size:14px}
+    .lock span{color:var(--muted); font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-badge"></div>
+        <div>
+          <div>AGAR PRO</div>
+          <div style="font-size:12px;color:var(--muted);font-weight:700;letter-spacing:0;">Premium Shop</div>
+        </div>
+      </div>
+
+      <div class="row" style="align-items:center; justify-content:flex-end">
+        <div class="pill"><small>Kullanıcı</small> <span id="uName">-</span></div>
+        <div class="pill"><small>GOLD</small> <span id="uGold">0</span> 🟡</div>
+        <button class="btn" onclick="goHome()">← Oyuna Dön</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div id="locked" class="lock">
+      <div>
+        <b>Bu sayfa sadece üyeler için.</b><br/>
+        <span>Giriş yaptıktan sonra Shop'a girebilirsin.</span>
+      </div>
+      <button class="btn btn-primary" onclick="goHome()">Ana Sayfaya Git</button>
+    </div>
+
+    <div id="content" class="grid" style="display:none;">
+      <div class="card">
+        <h2>🎁 Sandıklar <span class="sub">Topladıklarını burada açarsın</span></h2>
+
+        <div class="row">
+          <div class="tile"><b>Common</b><span>Stok: <span id="c_common">0</span></span></div>
+          <div class="tile"><b>Rare</b><span>Stok: <span id="c_rare">0</span></span></div>
+          <div class="tile"><b>Epic</b><span>Stok: <span id="c_epic">0</span></span></div>
+          <div class="tile"><b>Legendary</b><span>Stok: <span id="c_legendary">0</span></span></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="reel-wrap">
+          <div class="marker"></div>
+          <div id="reel" class="reel"></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <button class="btn btn-primary" onclick="openChest('common')">Common Aç</button>
+          <button class="btn btn-primary" onclick="openChest('rare')">Rare Aç</button>
+          <button class="btn btn-primary" onclick="openChest('epic')">Epic Aç</button>
+          <button class="btn btn-primary" onclick="openChest('legendary')">Legendary Aç</button>
+        </div>
+
+        <div class="hint" style="margin-top:10px;">
+          Sandık açma ödülleri <b>GOLD</b> verir. Mass / skor ile karışmaz.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🎰 Şans Çarkı <span class="sub">5 dakikada 1</span></h2>
+
+        <div class="wheel-area">
+          <canvas id="wheelCanvas" width="500" height="500"></canvas>
+
+          <div class="wheel-controls">
+            <div style="background:rgba(255,255,255,0.1); padding:8px; border-radius:8px; margin-bottom:10px; text-align:center;">
+                <span style="font-size:12px; color:#aaa;">MEVCUT HAKKIN:</span><br>
+                <span id="spinCount" style="font-size:24px; font-weight:bold; color:#f1c40f;">0</span>
+            </div>
+            
+            <button id="spinBtn" class="btn btn-primary" onclick="spin()">Çarkı Çevir (1 Hak)</button>
+            <div class="hint">
+              Hakkın yoksa oyunda (E) ile kazan.<br/>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="card" style="box-shadow:none; padding:14px; background:rgba(255,255,255,0.04);">
+              <b style="display:block; margin-bottom:6px;">💎 Premium</b>
+              <div class="hint">Premium P2W değildir: sadece <b>3x GOLD</b> (ekonomi) verir.</div>
+              <div class="divider"></div>
+              <button class="btn" onclick="buyPremium()">1 Hafta Premium Al (200.000 GOLD)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/shop.js"></script>
+</body>
+</html>
